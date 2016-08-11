@@ -11,25 +11,65 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      #messages_2 { list-style-type: none; margin: 0; padding: 0; }
+      #messages_2 li { padding: 5px 10px; }
+      #messages_2 li:nth-child(odd) { background: #eee; }
+      .self{
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        font-size: 18px;
+      }
+      .others{
+        position: absolute;
+        top: 8px;
+        left: 16px;
+        font-size: 18px;
+      }
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
+    <div class="others">
+      <ul id="messages"></ul>
+    </div>
+    <div class="self">
+      <ul id="messages_2"></ul>
+    </div>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+      var person = prompt("Please enter your name", "Harry Potter");
       var socket = io();
       $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
+        socket.emit('chat message', {my:$('#m').val(),name:person,socket_id: socket.id});
         $('#m').val('');
         return false;
       });
       socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
+        var data;
+        
+        if (socket.id == msg.socket_id){
+          data = "you: " + msg.my;
+          $('#messages').append($('<li>').text(data));
+        }
+        else{
+          data = msg.name + ": " + msg.my;
+
+          $('#messages_2').append($('<li>').text(data));
+        }
       });
+      // socket.on('connect', function(){
+      //     console.log("index.html");
+      //     socket.send('hi');
+
+      //     socket.on('message', function(msg){
+      //         console
+      //     });
+      // });
+
     </script>
   </body>
 </html>
