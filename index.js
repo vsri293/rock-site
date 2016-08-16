@@ -1,6 +1,8 @@
 // importing the express module
 var express = require('express');
 
+var path = require('path');
+
 var app = express();
 
 var agx = require('./game');
