@@ -37,8 +37,18 @@ jQuery(function($){
 		},
 
 		beginNewRound: function(data){
-			App.currentRound = data.round;
-			App[App.myRole].newRound(data);
+			console.log('begin new round');
+			console.log(data);
+			if (data.round == 0)
+			{
+				App.currentRound = data.round;
+				App[App.myRole].newRound(data);
+			}
+			else
+			{
+				App.currentRound = data.round;
+				App[App.myRole].nextRound(data);
+			}
 		},
 
 		hostCheckAnswer: function(data){
@@ -178,6 +188,13 @@ jQuery(function($){
 				App.Host.currentRound = data.round;
 			},
 
+			nextRound: function(data){
+				console.log('next round ');
+				console.log(data.p1Option);
+				console.log(data.p2Option);
+				App.Host.newRound(data);
+			},
+
 			roundWinner: function(data) {
 				console.log('roundWinner');
 				if (data.round == App.currentRound){
@@ -237,6 +254,9 @@ jQuery(function($){
 					App.currentRound += 1;
 					data.round += 1;
 					data.gameId = App.gameId;
+					data.p1Option = p1option;
+					data.p2Option = p2option;
+					data.winner = winner;
 					IO.socket.emit('hostNextRound', data);
 				}
 			},
@@ -309,11 +329,48 @@ jQuery(function($){
 							)
 						)
 				});
-
+				var $roundNo = '<p/>Round ' + App.currentRound;
+				
 				$('#roundNo').html($roundNo);
+				var $secondsLeft = $('#countTime');
+				var startTime = 10;
+				var timer = setInterval(countItDown, 1000);
+				function countItDown() {
+					startTime -= 1;
+					$secondsLeft.text(startTime);
+					if (startTime <= 0)
+					{
+						clearInterval(timer);
+					}
+				}
 				$('#playerOption').html($list);
 				// $('#gameArea').html($list);
 
+			},
+
+			nextRound: function(data){
+				console.log(data.p1Option);
+				console.log(data.p2Option);
+				var result = "DRAW";
+				var currPlayer;
+				if (data.winner == 0){
+
+				}
+				else{
+					if (App.Player.playerOption == data.p1Option)
+						currPlayer = 1;
+					else
+						currPlayer = 2;
+
+					if (currPlayer == data.winner)
+						result = "YOU WON";
+					else
+						result = "YOU LOSE";
+				}
+				var $notify = '<p class="center-text">'+result +'</p>';
+				$('#playerOption').html($notify);
+				console.log(result);
+				App.Player.newRound(data);
 			},
 
 			onPlayerAnswerClick: function() {
@@ -327,10 +384,10 @@ jQuery(function($){
 					answer: answer,
 					round: App.currentRound
 				} 
-				$('#gameArea')
-					.html('<div class="gameOver">Get Ready!</div>');
+				
 				console.log('answer click');
 				console.log(App.mySocketId);
+				$('#playerOption').html('<p class="center-text"/>You chose ' + answer);
 				IO.socket.emit('playerChoseOption', data);
 				// App.Host.playerOption = answer;
 			}

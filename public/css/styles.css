@@ -219,6 +219,14 @@ html, body {
     color: #AE37B2;
 }
 
+.center-text {
+    width: 100%;
+    font-family: 'Quicksand', sans-serif;
+    text-align: center;
+    font-weight: 400;
+    font-size: 3em;
+}
+
 
 
 /* ******************************

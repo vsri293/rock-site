@@ -39,7 +39,10 @@ function hostPrepareGame(gameId) {
 
 function hostStartGame(gameId) {
 	console.log('Game Started');
-	startRound(0, gameId);
+	var data = {'round':0, 'gameId': gameId};
+	data.round = 0;
+	data.gameId = gameId;
+	startRound(data);
 }
 
 function hostRoundOver(data) {
@@ -52,7 +55,7 @@ function hostNextRound(data) {
 	console.log('host next round');
 	console.log(data);
 	if (data.round < 3){
-		startRound(data.round, data.gameId);
+		startRound(data);
 	}
 	else
 	{
@@ -93,8 +96,9 @@ function playerChoseOption(data) {
 	}
 }
 
-function startRound(roundNo, gameId) {
-	var data = {round: roundNo, list: ["rock", "paper", "scissor"]};
-	console.log(gameId);
-	io.sockets.in(gameId).emit('beginNewRound', data);
+function startRound(data) {
+
+	data.list = ["rock", "paper", "scissor"];
+	console.log(data.gameId);
+	io.sockets.in(data.gameId).emit('beginNewRound', data);
 }
